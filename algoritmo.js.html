@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ventas de Carros</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    h1 {
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>Registro de Ventas de Carros</h1>
+
+  <div id="tabla-container"></div>
+
+  <script>
+    let ventas = [];
+    let cantidad = parseInt(prompt("¿Cuántas ventas de carros desea registrar?"));
+
+    if (isNaN(cantidad) || cantidad <= 0) {
+        alert("Debe ingresar un número válido de ventas.");
+    } else {
+        for (let i = 1; i <= cantidad; i++) {
+            let comprador = prompt(`Venta #${i} - Ingrese el nombre del comprador:`);
+            let marca = prompt("Ingrese la marca del carro:");
+            let modelo = prompt("Ingrese el modelo del carro:");
+            let precio = parseFloat(prompt("Ingrese el precio del carro:"));
+
+            if (isNaN(precio) || precio <= 0) {
+                alert("El precio ingresado no es válido.");
+                continue;
+            }
+
+            let formaPago = parseInt(prompt("Ingrese la forma de pago (1 = Contado, 2 = Crédito, 3 = Leasing):"));
+            let pagoTexto = "";
+
+            switch (formaPago) {
+                case 1: pagoTexto = "Contado"; break;
+                case 2: pagoTexto = "Crédito"; break;
+                case 3: pagoTexto = "Leasing"; break;
+                default: pagoTexto = "No especificado"; break;
+            }
+
+            ventas.push({ comprador, marca, modelo, precio, formaPago: pagoTexto });
+        }
+
+        // Crear tabla dinámicamente
+        let tabla = "<table><tr><th>#</th><th>Comprador</th><th>Marca</th><th>Modelo</th><th>Precio</th><th>Forma de Pago</th></tr>";
+        ventas.forEach((venta, index) => {
+            tabla += `<tr>
+                        <td>${index + 1}</td>
+                        <td>${venta.comprador}</td>
+                        <td>${venta.marca}</td>
+                        <td>${venta.modelo}</td>
+                        <td>$${venta.precio.toFixed(2)}</td>
+                        <td>${venta.formaPago}</td>
+                      </tr>`;
+        });
+        tabla += "</table>";
+
+        // Insertar tabla en el contenedor
+        document.getElementById("tabla-container").innerHTML = tabla;
+    }
+  </script>
+</body>
+</html>
