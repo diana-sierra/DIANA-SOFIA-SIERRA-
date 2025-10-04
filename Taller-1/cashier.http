@@ -1,0 +1,16 @@
+POST http://localhost:3000/cashier
+Content-Type: application/json 
+ Te voy a pasar un objeto de tipo JSON
+{
+  "id": "1asd2c4d5c7jk6d",
+  "totalPrice": 6000,
+  "date": "2020-01-01",
+  "paymentMethod": "cash",
+  "items": [
+    {
+      "id": 1,
+      "name": "Capuccino",
+      "price": 6000
+    }
+  ]
+}

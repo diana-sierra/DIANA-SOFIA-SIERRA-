@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tabla de Libros</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; padding: 20px; }
+    h1 { color: #1f6feb; }
+    table { border-collapse: collapse; width: 100%; max-width: 800px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background: #f4f7fb; }
+    tr:nth-child(even) { background: #fbfdff; }
+    .hint { color: #666; margin-top: 8px; font-size: 0.9rem; }
+    .error { color: #b00020; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Libros</h1>
+
+  <p class="hint">Se intentará cargar los libros desde <code>http://localhost:3000/libros</code>. Si no responde, se usarán datos estáticos.</p>
+
+  <div id="status" class="hint"></div>
+
+  <table id="tabla-libros" aria-describedby="status">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Título</th>
+        <th>Autor</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Filas se insertan aquí -->
+    </tbody>
+  </table>
+
+  <script>
+    // Datos estáticos (los mismos que en tu LibrosService)
+    const datosEstaticos = [
+      { id: 1, titulo: 'Cien años de soledad', autor: 'Gabriel García Márquez' },
+      { id: 2, titulo: 'La ciudad y los perros', autor: 'Mario Vargas Llosa' },
+    ];
+
+    const tbody = document.querySelector('#tabla-libros tbody');
+    const status = document.getElementById('status');
+
+    function poblarTabla(libros) {
+      tbody.innerHTML = ''; // limpiar
+      if (!Array.isArray(libros) || libros.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3">No hay libros para mostrar.</td></tr>';
+        return;
+      }
+      libros.forEach(l => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${escapeHtml(String(l.id ?? ''))}</td>
+          <td>${escapeHtml(l.titulo ?? '')}</td>
+          <td>${escapeHtml(l.autor ?? '')}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Protección mínima contra inyección al insertar texto en HTML
+    function escapeHtml(text) {
+      return text
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    // Intentar cargar desde la API; si falla, usar datos estáticos
+    async function cargarLibros() {
+      const url = 'http://localhost:3000/libros';
+      try {
+        status.textContent = 'Intentando cargar desde la API...';
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error('Respuesta no OK: ' + res.status);
+        const json = await res.json();
+        status.textContent = 'Datos cargados desde API.';
+        poblarTabla(json);
+      } catch (err) {
+        status.innerHTML = `<span class="error">No se pudo conectar a la API. Usando datos estáticos. (${escapeHtml(err.message)})</span>`;
+        poblarTabla(datosEstaticos);
+      }
+    }
+
+    // Ejecutar al cargar la página
+    cargarLibros();
+  </script>
+</body>
+</html>
+
